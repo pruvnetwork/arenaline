@@ -1,0 +1,15 @@
+[package]
+name = "duel-program"
+description = "On-chain wrapper around the duel tick function — replay target for the tickpruv referee"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[dependencies]
+duel = { path = "../../games/duel" }
+tick-core = { git = "https://github.com/pruvnetwork/tickpruv" }
+solana-program = "3.0.0"

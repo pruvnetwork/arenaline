@@ -1,0 +1,10 @@
+[package]
+name = "duel"
+description = "Two-agent trading duel: momentum vs mean-reversion, a deterministic tickpruv game"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+tick-core = { git = "https://github.com/pruvnetwork/tickpruv" }
