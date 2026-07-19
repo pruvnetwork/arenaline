@@ -92,8 +92,34 @@ fn write_log(path: &str, prices: &[i64]) {
     }
 }
 
-fn finish(state: &[u8], prices: &[i64], log_path: &str) {
+/// One tick: feed a price, advance both agents, print the board, record a trace
+/// row (used by the dashboard).
+fn advance(state: &mut [u8], prices: &mut Vec<i64>, trace: &mut Vec<String>, price: i64) {
+    let mut entry = [0u8; INPUT_ENTRY_SIZE];
+    entry.copy_from_slice(&price.to_le_bytes());
+    let t = prices.len() as u64;
+    Duel::tick(state, &entry, t).unwrap();
+    prices.push(price);
+    scoreboard(t, price, state);
+    let (ea, eb) = duel::equities(state);
+    let (pa, pb) = duel::positions(state);
+    trace.push(format!(
+        "{{\"t\":{t},\"price\":{:.6},\"ea\":{:.6},\"eb\":{:.6},\"pa\":{:.4},\"pb\":{:.4}}}",
+        fx_to_f64(price as i128),
+        fx_to_f64(ea),
+        fx_to_f64(eb),
+        fx_to_f64(pa as i128),
+        fx_to_f64(pb as i128),
+    ));
+}
+
+fn finish(state: &[u8], prices: &[i64], log_path: &str, trace: &[String]) {
     write_log(log_path, prices);
+    if let Ok(path) = std::env::var("TRACE") {
+        let json = format!("[{}]", trace.join(","));
+        let _ = fs::write(&path, json);
+        println!("trace -> {path}");
+    }
     let (ea, eb) = duel::equities(state);
     let winner = match duel::verdict(state).unwrap_or(0) {
         1 => "AGENT A — momentum",
@@ -114,16 +140,7 @@ fn main() {
     Duel::init(&mut state).unwrap();
     let mut prices: Vec<i64> = Vec::new();
     let log_path = env_or("LOG", "match.tplog");
-
-    // one tick: feed a price, advance, show the board
-    let step = |state: &mut [u8], prices: &mut Vec<i64>, price: i64| {
-        let mut entry = [0u8; INPUT_ENTRY_SIZE];
-        entry.copy_from_slice(&price.to_le_bytes());
-        let t = prices.len() as u64;
-        Duel::tick(state, &entry, t).unwrap();
-        prices.push(price);
-        scoreboard(t, price, state);
-    };
+    let mut trace: Vec<String> = Vec::new();
 
     if let Ok(path) = env::var("REPLAY") {
         // offline demo: one decimal probability per line
@@ -135,10 +152,10 @@ fn main() {
                 continue;
             }
             if let Ok(p) = s.parse::<f64>() {
-                step(&mut state, &mut prices, prob_to_fx(p));
+                advance(&mut state, &mut prices, &mut trace, prob_to_fx(p));
             }
         }
-        finish(&state, &prices, &log_path);
+        finish(&state, &prices, &log_path, &trace);
         return;
     }
 
@@ -156,7 +173,7 @@ fn main() {
     loop {
         if let Some(price) = fetch_price(&host, &jwt, &api, &fixture, idx) {
             if last_fed != Some(price) {
-                step(&mut state, &mut prices, price);
+                advance(&mut state, &mut prices, &mut trace, price);
                 last_fed = Some(price);
             }
         } else {
@@ -167,5 +184,5 @@ fn main() {
         }
         thread::sleep(Duration::from_secs(poll));
     }
-    finish(&state, &prices, &log_path);
+    finish(&state, &prices, &log_path, &trace);
 }

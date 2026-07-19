@@ -4,6 +4,8 @@
 
 arenaline is an *Agent vs Agent Arena* for the [TxODDS World Cup hackathon](https://superteam.fun/earn/listing/trading-tools-and-agents) (Trading Tools & Agents track). Two agents read the **same live TxLINE odds feed** and run opposite deterministic strategies — one chases momentum, one fades it (mean-reversion). Positions mark to market every TxLINE update; whoever holds more equity at the settled price wins.
 
+**Live demo: [arenaline.vercel.app](https://arenaline.vercel.app)** · devnet program `AWQDizXJLqXUUBHkvmUBcowCXQawZCQ2L6jNcTexMdk5`
+
 The twist: it runs on the **[tickpruv](https://github.com/pruvnetwork/tickpruv) verifiable engine.** Each agent's decision is a deterministic tick that compiles to SBF and runs off-chain at full speed. If anyone disputes the result, the tick is **replayed by Solana itself** — so the P&L race is provable, not reported. No trusted server decides who won.
 
 > Scope, stated honestly: the "agents" are small **deterministic rule-based strategies**, not LLMs. That is exactly the class of agent that can be replayed on-chain. arenaline proves *strategy execution*, not general "AI."

@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>arenaline — agent vs agent arena</title>
+<meta name="description" content="Two autonomous trading agents duel on live World Cup odds. The chain decides who traded better — provable, not reported. Built on tickpruv." />
+<style>
+  :root{
+    --bg:#0a0a0f; --panel:#12121b; --panel2:#171725; --line:#24243a;
+    --fg:#ececf4; --muted:#a2a2bf; --faint:#6c6c8a;
+    --violet:#8b7cff; --violet2:#b3a6ff;
+    --a:#4ade80; --b:#fb6f92; --serial:#f5a524;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--fg);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .nums{font-variant-numeric:tabular-nums;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  a{color:var(--violet2);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:960px;margin:0 auto;padding:0 20px}
+  header{position:sticky;top:0;z-index:10;border-bottom:1px solid var(--line);
+    background:rgba(10,10,15,.82);backdrop-filter:blur(10px)}
+  .nav{display:flex;align-items:center;gap:12px;height:58px}
+  .logo{display:flex;align-items:center;gap:9px;font-weight:700;letter-spacing:-.02em}
+  .mark{width:24px;height:24px;border-radius:7px;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--violet),#f472b6);color:#0a0a0f;font-weight:800;font-size:13px}
+  .nav .sub{color:var(--faint);font-size:12px}
+  .grow{flex:1}
+  .badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--serial);
+    border:1px solid color-mix(in srgb,var(--serial) 40%,transparent);
+    background:color-mix(in srgb,var(--serial) 10%,transparent);border-radius:999px;padding:3px 9px}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--serial);box-shadow:0 0 0 3px color-mix(in srgb,var(--serial) 25%,transparent)}
+  .hero{text-align:center;padding:54px 0 30px}
+  .kicker{color:var(--violet2);font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase}
+  h1{font-size:clamp(30px,5vw,50px);line-height:1.04;letter-spacing:-.03em;margin:14px 0 0;font-weight:800}
+  h1 .g{background:linear-gradient(135deg,var(--violet2),#f472b6);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{max-width:620px;margin:16px auto 0;color:var(--muted);font-size:16px;line-height:1.55}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+  .card + .card{margin-top:18px}
+  .chead{display:flex;align-items:center;gap:10px;padding:13px 18px;border-bottom:1px solid var(--line);
+    font-size:12px;color:var(--faint);letter-spacing:.04em;text-transform:uppercase;flex-wrap:wrap}
+  .chead b{color:var(--fg);text-transform:none;letter-spacing:0;font-size:13px}
+  .agents{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px}
+  .agent{border:1px solid var(--line);border-radius:14px;padding:15px;background:var(--panel2);transition:border-color .2s,box-shadow .2s}
+  .agent.lead{box-shadow:0 0 0 1px currentColor inset, 0 8px 30px -18px currentColor}
+  .agent.A{color:var(--a)} .agent.B{color:var(--b)}
+  .aname{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;color:var(--fg)}
+  .swatch{width:10px;height:10px;border-radius:3px;background:currentColor}
+  .astrat{color:var(--faint);font-size:12px;margin-top:2px}
+  .aeq{font-size:30px;font-weight:800;margin-top:12px;letter-spacing:-.02em;color:var(--fg)}
+  .aeq small{font-size:14px;color:var(--faint);font-weight:600}
+  .apos{color:var(--muted);font-size:13px;margin-top:3px}
+  canvas{display:block;width:100%;height:220px}
+  .ctrls{display:flex;align-items:center;gap:10px;padding:12px 18px;border-top:1px solid var(--line)}
+  button{font:inherit;font-size:13px;font-weight:600;color:var(--fg);background:var(--panel2);
+    border:1px solid var(--line);border-radius:9px;padding:8px 14px;cursor:pointer}
+  button:hover{border-color:var(--violet)}
+  button.primary{background:linear-gradient(135deg,var(--violet),#a78bfa);color:#0a0a0f;border:none}
+  .status{color:var(--muted);font-size:13px;margin-left:auto}
+  .status b{color:var(--fg)}
+  .proof{padding:16px 18px;font-size:14px;line-height:1.6;color:var(--muted)}
+  .kv{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:12px}
+  .kv div{display:flex;flex-direction:column}
+  .kv span{font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.05em}
+  .kv b{font-size:15px;color:var(--fg)}
+  .how{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:16px}
+  .how div{border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--panel2)}
+  .how h3{margin:0 0 5px;font-size:14px}
+  .how p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
+  .fair{display:flex;align-items:center;gap:8px;border-top:1px solid var(--line);padding:12px 18px;color:var(--faint);font-size:12px}
+  footer{border-top:1px solid var(--line);margin-top:40px;padding:26px 0;color:var(--faint);font-size:13px}
+  footer .wrap{display:flex;gap:18px;flex-wrap:wrap;align-items:center}
+  @media(max-width:640px){.agents,.how{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><div class="wrap nav">
+  <span class="logo"><span class="mark">A</span>arenaline <span class="sub">· agent vs agent arena</span></span>
+  <span class="grow"></span>
+  <span class="badge"><span class="dot"></span>devnet</span>
+  <a href="https://github.com/pruvnetwork/arenaline" target="_blank" rel="noreferrer" style="color:var(--muted)">GitHub ↗</a>
+</div></header>
+
+<main class="wrap">
+  <section class="hero">
+    <div class="kicker">Trading tools &amp; agents · TxODDS World Cup</div>
+    <h1>Two agents duel on live odds.<br><span class="g">The chain says who won.</span></h1>
+    <p class="lede">A momentum agent and a mean-reversion agent read the <b>same live TxLINE feed</b> and trade against it. Positions mark to market every update — and the winner is <b>replayed on-chain</b>, so the P&amp;L race is provable, not reported.</p>
+  </section>
+
+  <section class="card">
+    <div class="chead">
+      <b>Live arena</b> · replay
+      <span id="meta">tick 0 / 0 · home-win price —</span>
+    </div>
+    <div class="agents">
+      <div class="agent A" id="agA">
+        <div class="aname"><span class="swatch"></span>Agent A</div>
+        <div class="astrat">Momentum — chase the move</div>
+        <div class="aeq nums"><span id="eqA">100.00</span> <small>pts</small></div>
+        <div class="apos nums" id="posA">position 0.0</div>
+      </div>
+      <div class="agent B" id="agB">
+        <div class="aname"><span class="swatch"></span>Agent B</div>
+        <div class="astrat">Mean-reversion — fade the move</div>
+        <div class="aeq nums"><span id="eqB">100.00</span> <small>pts</small></div>
+        <div class="apos nums" id="posB">position 0.0</div>
+      </div>
+    </div>
+    <canvas id="chart"></canvas>
+    <div class="ctrls">
+      <button class="primary" id="play">Pause</button>
+      <button id="restart">Restart</button>
+      <span class="status" id="status">racing…</span>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="chead"><b>Provably settled</b> · on-chain, not reported</div>
+    <div class="proof">
+      The whole match is a tickpruv input log: genesis state + the price log replays to the exact same
+      final state. Replayed tick-by-tick through the deployed duel program, its own verdict matches the
+      runner bit-for-bit — <b style="color:var(--fg)">A 98.289 vs B 101.711 → Agent B</b>, native and on-chain.
+      That is the one step the tickpruv referee runs to settle a disputed tick, so no server decides the winner.
+      <div class="kv">
+        <div><span>duel program (devnet)</span><b><a href="https://explorer.solana.com/address/AWQDizXJLqXUUBHkvmUBcowCXQawZCQ2L6jNcTexMdk5?cluster=devnet" target="_blank" rel="noreferrer">AWQDizX…Mdk5 ↗</a></b></div>
+        <div><span>one-step proof</span><b>~19k CU</b></div>
+        <div><span>vs zkVM verify</span><b>~280k CU</b></div>
+        <div><span>engine</span><b><a href="https://github.com/pruvnetwork/tickpruv" target="_blank" rel="noreferrer">tickpruv ↗</a></b></div>
+      </div>
+    </div>
+    <div class="fair">✓ Provably fair: the data comes from TxLINE's on-chain-anchored feed; the P&amp;L comes from replayable SBF. You can't fake the odds or the winner.</div>
+  </section>
+
+  <section class="card">
+    <div class="chead"><b>How it works</b></div>
+    <div class="how">
+      <div><h3>Live TxLINE input</h3><p>The runner polls the real 1X2 odds; the home-win probability is the price both agents see each tick.</p></div>
+      <div><h3>Deterministic strategies</h3><p>Fixed-point, no floats, all saturating — so every decision replays bit-identically on Solana.</p></div>
+      <div><h3>Trustless settlement</h3><p>Dispute a tick and the chain replays it via the tickpruv referee; the loser's bond is slashed.</p></div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <span>Built on <a href="https://github.com/pruvnetwork/tickpruv" target="_blank" rel="noreferrer">tickpruv</a> · <a href="https://github.com/pruvnetwork" target="_blank" rel="noreferrer">PRUV Network</a> — don't trust, verify.</span>
+  <span class="grow"></span>
+  <span>devnet · illustrative replay · live mode drives this from real TxLINE odds</span>
+</div></footer>
+
+<script>
+const $ = id => document.getElementById(id);
+let trace = [], cur = 0, playing = true, timer = null;
+
+function fmt(n){ return n.toFixed(2); }
+function draw(){
+  const c = $('chart'), dpr = window.devicePixelRatio||1;
+  const w = c.clientWidth, h = c.clientHeight;
+  c.width = w*dpr; c.height = h*dpr;
+  const x = c.getContext('2d'); x.scale(dpr,dpr);
+  x.clearRect(0,0,w,h);
+  if(!trace.length) return;
+  const pad = 14;
+  let lo=1e9, hi=-1e9;
+  for(const p of trace){ lo=Math.min(lo,p.ea,p.eb); hi=Math.max(hi,p.ea,p.eb); }
+  const span = Math.max(hi-lo, 0.5); lo-=span*0.15; hi+=span*0.15;
+  const X = i => pad + (w-2*pad) * (i/(trace.length-1));
+  const Y = v => pad + (h-2*pad) * (1-(v-lo)/(hi-lo));
+  // baseline at 100
+  x.strokeStyle='#24243a'; x.lineWidth=1; x.setLineDash([4,4]);
+  x.beginPath(); x.moveTo(pad,Y(100)); x.lineTo(w-pad,Y(100)); x.stroke(); x.setLineDash([]);
+  const line = (key,color)=>{
+    x.strokeStyle=color; x.lineWidth=2.2; x.beginPath();
+    for(let i=0;i<=cur;i++){ const px=X(i), py=Y(trace[i][key]); i?x.lineTo(px,py):x.moveTo(px,py); }
+    x.stroke();
+    const lx=X(cur), ly=Y(trace[cur][key]);
+    x.fillStyle=color; x.beginPath(); x.arc(lx,ly,3.5,0,7); x.fill();
+  };
+  line('ea', getComputedStyle(document.body).getPropertyValue('--a').trim());
+  line('eb', getComputedStyle(document.body).getPropertyValue('--b').trim());
+  // playhead
+  x.strokeStyle='#33334d'; x.lineWidth=1; x.beginPath(); x.moveTo(X(cur),pad); x.lineTo(X(cur),h-pad); x.stroke();
+}
+function render(){
+  if(!trace.length) return;
+  const p = trace[cur];
+  $('eqA').textContent = fmt(p.ea); $('eqB').textContent = fmt(p.eb);
+  $('posA').textContent = 'position '+(p.pa>0?'+':'')+p.pa.toFixed(1);
+  $('posB').textContent = 'position '+(p.pb>0?'+':'')+p.pb.toFixed(1);
+  $('meta').textContent = `tick ${p.t} / ${trace.length-1} · home-win price ${(p.price*100).toFixed(1)}%`;
+  $('agA').classList.toggle('lead', p.ea>p.eb);
+  $('agB').classList.toggle('lead', p.eb>=p.ea && cur>0);
+  if(cur>=trace.length-1){
+    const win = p.eb>p.ea ? 'Agent B — mean-reversion' : p.ea>p.eb ? 'Agent A — momentum' : 'draw';
+    $('status').innerHTML = 'full time — winner <b>'+win+'</b> · settled on-chain';
+  } else {
+    $('status').innerHTML = 'racing… <b>'+(p.ea>p.eb?'A':p.eb>p.ea?'B':'—')+'</b> leads';
+  }
+  draw();
+}
+function tick(){
+  if(!playing) return;
+  if(cur < trace.length-1){ cur++; render(); }
+  else { playing=false; $('play').textContent='Replay'; setTimeout(()=>{ if(!playing){cur=0;playing=true;$('play').textContent='Pause';loop();} }, 2600); }
+}
+function loop(){ clearInterval(timer); timer=setInterval(tick, 170); }
+$('play').onclick = ()=>{ playing=!playing; $('play').textContent=playing?'Pause':'Play'; if(playing) loop(); };
+$('restart').onclick = ()=>{ cur=0; playing=true; $('play').textContent='Pause'; render(); loop(); };
+window.addEventListener('resize', draw);
+fetch('trace.json').then(r=>r.json()).then(d=>{ trace=d; cur=0; render(); loop(); })
+  .catch(()=>{ $('status').textContent='could not load trace'; });
+</script>
+</body>
+</html>

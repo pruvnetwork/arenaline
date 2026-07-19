@@ -4,3 +4,4 @@ Cargo.lock
 .env
 *.log
 /node_modules
+/web/.vercel
