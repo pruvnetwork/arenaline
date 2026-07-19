@@ -1,0 +1,17 @@
+[package]
+name = "arenaline-runner"
+description = "Autonomous driver: pulls live TxLINE odds, ticks both agents, prints the P&L race, writes the tickpruv input log"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "arenaline"
+path = "src/main.rs"
+
+[dependencies]
+duel = { path = "../games/duel" }
+tick-core = { git = "https://github.com/pruvnetwork/tickpruv" }
+ureq = { version = "2.10", features = ["json"] }
+serde_json = "1"

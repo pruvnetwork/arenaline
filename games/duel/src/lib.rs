@@ -108,6 +108,21 @@ pub fn verdict(state: &[u8]) -> Result<u8, TickError> {
     })
 }
 
+/// Mark-to-market equity of both agents at the last price in `state`. For the
+/// runner's live scoreboard; `verdict` is the on-chain-settled version.
+pub fn equities(state: &[u8]) -> (i128, i128) {
+    let price = le::read_i64(state, LAST_PRICE);
+    (
+        equity(state, CASH_A, POS_A, price),
+        equity(state, CASH_B, POS_B, price),
+    )
+}
+
+/// Current signed positions (agent A, agent B) in Fx shares.
+pub fn positions(state: &[u8]) -> (Fx, Fx) {
+    (le::read_i64(state, POS_A), le::read_i64(state, POS_B))
+}
+
 impl TickLogic for Duel {
     const STATE_SIZE: usize = STATE_SIZE;
 

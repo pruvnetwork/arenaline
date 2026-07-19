@@ -3,6 +3,7 @@ resolver = "2"
 members = [
     "games/duel",
     "programs/duel-program",
+    "runner",
 ]
 
 [workspace.package]
