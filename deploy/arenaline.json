@@ -1,0 +1,10 @@
+{
+  "cluster": "devnet",
+  "duelProgram": "AWQDizXJLqXUUBHkvmUBcowCXQawZCQ2L6jNcTexMdk5",
+  "tickpruv": {
+    "wager": "Cs1z5RKFzUNughgamPk3yA7jJhbMMXHNb1YXp2Mbuv4d",
+    "referee": "Fq4ThqS2tFAWbcSce5pKqcEBB9k4XJxbsq6Mzpjh3yJ7"
+  },
+  "stateSize": 48,
+  "inputEntrySize": 8
+}

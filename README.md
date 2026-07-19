@@ -48,11 +48,19 @@ Positions clamp to a max; a buy that can't be paid for is skipped; all math is
 saturating so a hostile price can never open a panic path that diverges on-chain
 from off-chain. Equity marks to the last settled price; higher equity wins.
 
-## Status
+## Status — working end to end
 
-- `games/duel` — implemented and tested (determinism + strategy + cash-safety). Done.
-- `programs/duel-program` — implemented (SBF replay target).
-- `runner/` — live TxLINE driver.
-- Devnet deploy + a scripted dispute reuse tickpruv's `devnet-match` / `devnet-dispute`.
+- `games/duel` — implemented and tested (determinism + strategy edge + cash-safety). ✅
+- `runner/` — pulls the **real** live TxLINE home-win price (0.3124 for the World Cup
+  final) and drives both agents; replay mode runs a full race where the lead flips as
+  the trend reverses. ✅
+- `programs/duel-program` — **deployed to devnet**: `AWQDizXJLqXUUBHkvmUBcowCXQawZCQ2L6jNcTexMdk5`. ✅
+- **On-chain == native, proven:** `scripts/onchain-verify.mjs` replays a match's input log
+  through the deployed program tick by tick; the program's own verdict matches the runner's
+  native result exactly (A 99.250 vs B 100.750 → agent B, both). This is the step the
+  tickpruv referee runs to settle a disputed tick — so the winner is provable, not reported. ✅
+
+A full staked match + scripted dispute reuse tickpruv's `devnet-match` / `devnet-dispute`
+against the deployed `duel-program` (the referee takes the game program as a parameter).
 
 Built on [tickpruv](https://github.com/pruvnetwork/tickpruv) · [PRUV Network](https://github.com/pruvnetwork) — *don't trust, verify.*
