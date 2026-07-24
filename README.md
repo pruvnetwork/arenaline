@@ -59,7 +59,7 @@ from off-chain. Equity marks to the last settled price; higher equity wins.
 - `programs/duel-program` — **deployed to devnet**: `AWQDizXJLqXUUBHkvmUBcowCXQawZCQ2L6jNcTexMdk5`. ✅
 - **On-chain == native, proven:** `scripts/onchain-verify.mjs` replays a match's input log
   through the deployed program tick by tick; the program's own verdict matches the runner's
-  native result exactly (A 99.250 vs B 100.750 → agent B, both). This is the step the
+  native result exactly (A 98.289 vs B 101.711 → agent B, both). This is the step the
   tickpruv referee runs to settle a disputed tick — so the winner is provable, not reported. ✅
 
 A full staked match + scripted dispute reuse tickpruv's `devnet-match` / `devnet-dispute`

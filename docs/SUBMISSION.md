@@ -37,7 +37,7 @@ https://github.com/pruvnetwork/arenaline
 - Live dashboard: **https://arenaline.vercel.app** (animated P&L race + on-chain proof panel)
 - Devnet program (duel): `AWQDizXJLqXUUBHkvmUBcowCXQawZCQ2L6jNcTexMdk5`
   — https://explorer.solana.com/address/AWQDizXJLqXUUBHkvmUBcowCXQawZCQ2L6jNcTexMdk5?cluster=devnet
-- Reproduce the trustless settlement: `scripts/onchain-verify.mjs <match.tplog>` replays a match's
+- Reproduce the trustless settlement: `scripts/onchain-verify.mjs match.tplog` (the log is committed at the repo root) replays a match's
   input log through the deployed program; its verdict matches the runner bit-for-bit
   (A 98.289 vs B 101.711 → Agent B, native and on-chain).
 
