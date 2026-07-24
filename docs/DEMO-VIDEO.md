@@ -17,7 +17,7 @@ Point at the tick counter / price (`home-win price`) and the two equity curves c
 Scroll to the **Provably settled** panel.
 > "The winner isn't reported by a server. The whole match is a tickpruv input log — genesis state plus
 > the price log replays to the exact same state. Replayed through our on-chain program, its own verdict
-> matches the runner bit-for-bit: A 98.289 vs B 101.711, Agent B — native and on-chain. One-step proof:
+> matches the runner bit-for-bit: A 90.412 vs B 109.588, Agent B — native and on-chain. One-step proof:
 > ~19k compute units, versus ~280k for a zkVM."
 
 Click the **duel program** link → Solana explorer (devnet) briefly.
@@ -50,7 +50,7 @@ Replay the same log through the deployed program:
 PAYER=$PAYER RPC=$RPC node scripts/onchain-verify.mjs match.tplog
 ```
 > "Same input log, now executed on Solana tick by tick. The program's own verdict: Agent B — matching
-> the native runner exactly, A 98.289 vs B 101.711. This is the precise step the tickpruv referee runs
+> the native runner exactly, A 90.412 vs B 109.588. This is the precise step the tickpruv referee runs
 > to settle a disputed tick. So no one can lie about who traded better."
 
 ## Scene 6 — close  (4:20–5:00)  · browser
@@ -73,8 +73,36 @@ export API=<arenaline TXLINE_API_TOKEN>
 export PAYER=/path/to/arenaline-payer.json      # ~0.3 devnet SOL, funds the verify tx
 export RPC=<a devnet RPC url>
 
-# the illustrative price path used in the dashboard (or record your own live):
-printf '0.35\n0.40\n0.45\n0.50\n0.55\n0.60\n0.55\n0.50\n0.46\n0.52\n0.58\n0.64\n0.70\n0.62\n0.54\n0.46\n0.38\n0.30\n0.25\n' > match_path.txt
+# the price path the dashboard replays (the World Cup final run; or record your own live):
+printf '0.3082
+0.3039
+0.299
+0.2687
+0.2305
+0.1913
+0.1394
+0.406
+0.3954
+0.3902
+0.3962
+0.3949
+0.3925
+0.3761
+0.3579
+0.354
+0.338
+0.3266
+0.3014
+0.2972
+0.4227
+0.5252
+0.5497
+0.4866
+0.4778
+0.4119
+0.9242
+0.9355
+' > match_path.txt
 ```
 `onchain-verify.mjs` needs `@solana/web3.js` — `npm i @solana/web3.js` in the repo, or run it from any
 folder that has it.

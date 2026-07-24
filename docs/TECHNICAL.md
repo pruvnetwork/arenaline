@@ -52,8 +52,8 @@ match's input log through the deployed program tick by tick and asks the program
 matches the runner's native result exactly:
 
 ```
-native (runner):    A 98.289  vs  B 101.711  →  Agent B
-on-chain (program): A 98.289  vs  B 101.711  →  Agent B
+native (runner):    A 90.412  vs  B 109.588  →  Agent B
+on-chain (program): A 90.412  vs  B 109.588  →  Agent B
 ```
 
 That is precisely the one step the tickpruv referee runs to resolve a disputed tick. A full staked

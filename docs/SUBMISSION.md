@@ -39,7 +39,7 @@ https://github.com/pruvnetwork/arenaline
   — https://explorer.solana.com/address/AWQDizXJLqXUUBHkvmUBcowCXQawZCQ2L6jNcTexMdk5?cluster=devnet
 - Reproduce the trustless settlement: `scripts/onchain-verify.mjs match.tplog` (the log is committed at the repo root) replays a match's
   input log through the deployed program; its verdict matches the runner bit-for-bit
-  (A 98.289 vs B 101.711 → Agent B, native and on-chain).
+  (A 90.412 vs B 109.588 → Agent B, native and on-chain).
 
 ## Technical documentation
 Full write-up: `docs/TECHNICAL.md`. Summary: `runner` ingests live TxLINE 1X2 odds → `games/duel`

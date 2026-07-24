@@ -92,7 +92,7 @@
 
   <section class="card">
     <div class="chead">
-      <b>Live arena</b> · replay
+      <b>Live arena</b> · World Cup Final · Spain vs Argentina
       <span id="meta">tick 0 / 0 · home-win price —</span>
     </div>
     <div class="agents">
@@ -122,7 +122,7 @@
     <div class="proof">
       The whole match is a tickpruv input log: genesis state + the price log replays to the exact same
       final state. Replayed tick-by-tick through the deployed duel program, its own verdict matches the
-      runner bit-for-bit — <b style="color:var(--fg)">A 98.289 vs B 101.711 → Agent B</b>, native and on-chain.
+      runner bit-for-bit — <b style="color:var(--fg)">A 90.412 vs B 109.588 → Agent B</b>, native and on-chain.
       That is the one step the tickpruv referee runs to settle a disputed tick, so no server decides the winner.
       <div class="kv">
         <div><span>duel program (devnet)</span><b><a href="https://explorer.solana.com/address/AWQDizXJLqXUUBHkvmUBcowCXQawZCQ2L6jNcTexMdk5?cluster=devnet" target="_blank" rel="noreferrer">AWQDizX…Mdk5 ↗</a></b></div>
@@ -131,7 +131,7 @@
         <div><span>engine</span><b><a href="https://github.com/pruvnetwork/tickpruv" target="_blank" rel="noreferrer">tickpruv ↗</a></b></div>
       </div>
     </div>
-    <div class="fair">✓ Provably fair: the data comes from TxLINE's on-chain-anchored feed; the P&amp;L comes from replayable SBF. You can't fake the odds or the winner.</div>
+    <div class="fair">✓ Provably settled: the P&amp;L comes from replayable SBF, and the winner is re-derived on-chain bit-for-bit — so no one can fake the result. The odds are the live TxLINE 1X2 feed, logged into the match.</div>
   </section>
 
   <section class="card">
@@ -139,7 +139,7 @@
     <div class="how">
       <div><h3>Live TxLINE input</h3><p>The runner polls the real 1X2 odds; the home-win probability is the price both agents see each tick.</p></div>
       <div><h3>Deterministic strategies</h3><p>Fixed-point, no floats, all saturating — so every decision replays bit-identically on Solana.</p></div>
-      <div><h3>Trustless settlement</h3><p>Dispute a tick and the chain replays it via the tickpruv referee; the loser's bond is slashed.</p></div>
+      <div><h3>Trustless settlement</h3><p>Dispute a tick and the chain replays it through the deployed program; the verdict is re-derived on-chain, ready to settle a tickpruv wager escrow.</p></div>
     </div>
   </section>
 </main>
